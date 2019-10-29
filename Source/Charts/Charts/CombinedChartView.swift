@@ -175,6 +175,13 @@ open class CombinedChartView: BarLineChartViewBase, CombinedChartDataProvider
         get { return (renderer as! CombinedChartRenderer).drawBarShadowEnabled }
         set { (renderer as! CombinedChartRenderer).drawBarShadowEnabled = newValue }
     }
+
+    /// if set to true, a rounded rectangle with the corners is drawn on each bar
+    open var drawRoundedBarEnabled: Bool
+        {
+        get { return (renderer as! CombinedChartRenderer!).drawRoundedBarEnabled }
+        set { (renderer as! CombinedChartRenderer!).drawRoundedBarEnabled = newValue }
+    }
     
     /// - returns: `true` if drawing values above bars is enabled, `false` ifnot
     open var isDrawValueAboveBarEnabled: Bool { return (renderer as! CombinedChartRenderer).drawValueAboveBarEnabled }
@@ -243,4 +250,9 @@ open class CombinedChartView: BarLineChartViewBase, CombinedChartDataProvider
             marker.draw(context: context, point: pos)
         }
     }
+
+
+    /// - returns: `true` if drawing rounded bars is enabled, `false` ifnot
+    open var isDrawRoundedBarEnabled: Bool { return drawRoundedBarEnabled }
+
 }

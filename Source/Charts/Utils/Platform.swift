@@ -569,6 +569,66 @@ public typealias NSUIGestureRecognizerState = UIGestureRecognizer.State
 		}
     }
 
+    extension NSBezierPath
+    {
+        var cgPath: CGPath
+        {
+            let mutablePath = CGMutablePath()
+            var points = [CGPoint](repeating: .zero, count: 3)
+            for i in 0 ..< elementCount
+            {
+                let type = element(at: i, associatedPoints: &points)
+                switch type
+                {
+                case .moveTo:
+                    mutablePath.move(
+                        to: CGPoint(
+                            x: points[0].x,
+                            y: points[0].y
+                        )
+                    )
+                case .lineTo:
+                    mutablePath.addLine(
+                        to: CGPoint(
+                            x: points[0].x,
+                            y: points[0].y
+                        )
+                    )
+                case .curveTo:
+                    mutablePath.addCurve(
+                        to: CGPoint(
+                            x: points[2].x,
+                            y: points[2].y
+                        ),
+                        control1: CGPoint(
+                            x: points[0].x,
+                            y: points[0].y
+                        ),
+                        control2: CGPoint(
+                            x: points[1].x,
+                            y: points[1].y
+                        )
+                    )
+                case .closePath:
+                    mutablePath.closeSubpath()
+                }
+            }
+            return mutablePath
+        }
+    }
+    
+    extension NSString
+    {
+        // iOS: size(attributes: ...), OSX: size(withAttributes: ...)
+        // Both are translated into sizeWithAttributes: on ObjC. So conflict...
+        @nonobjc
+        func size(attributes attrs: [String : Any]? = nil) -> NSSize
+        {
+            return NSSize.zero
+        }
+    }
+
+
 	func NSUIGraphicsGetCurrentContext() -> CGContext?
     {
 		return NSGraphicsContext.current?.cgContext
