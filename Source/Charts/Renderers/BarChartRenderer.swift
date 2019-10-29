@@ -339,43 +339,6 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 break
             }
             
-            if !isSingleColor
-            {
-                // Set the color for the currently drawn value. If the index is out of bounds, reuse colors.
-                context.setFillColor(dataSet.color(atIndex: j).cgColor)
-            }
-
-            if dataProvider.isDrawRoundedBarEnabled
-            {
-                let cornerRadius = CGSize(width: barRect.width / 2.0, height: barRect.width / 2.0)
-                #if os(OSX)
-                    let bezierPath = NSBezierPath(roundedRect: barRect, xRadius: cornerRadius.width, yRadius: cornerRadius.height)
-                    context.addPath(bezierPath.cgPath)
-                #else
-                    let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: dataSet.barRoundingCorners, cornerRadii: cornerRadius)
-                    context.addPath(bezierPath.cgPath)
-                #endif
-                context.fillPath()
-
-                if drawBorder
-                {
-                    bezierPath.lineWidth = borderWidth
-                    borderColor.setStroke()
-                    bezierPath.stroke()
-                }
-            }
-            else
-            {
-                context.fill(barRect)
-
-                if drawBorder
-                {
-                    context.setStrokeColor(borderColor.cgColor)
-                    context.setLineWidth(borderWidth)
-                    context.stroke(barRect)
-                }
-
-            }
 
             // Create and append the corresponding accessibility element to accessibilityOrderedElements
             if let chart = dataProvider as? BarChartView
@@ -399,17 +362,9 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
         context.saveGState()
         defer { context.restoreGState() }
         
-        if let gradientColor = dataSet.barGradientColor(at: index)
-        {
-            drawGradient(context: context, barRect: barRect, gradientColors: gradientColor, orientation: dataSet.barGradientOrientation)
-        }
-        else
-        {
-            // Set the color for the currently drawn value. If the index is out of bounds, reuse colors.
-            let fillColor = dataSet.color(atIndex: index).cgColor
-            context.setFillColor(fillColor)
-            context.fill(barRect)
-        }
+        let colors = dataSet.barGradientColor(at: index) ?? [UIColor.white, UIColor.black]
+        
+        drawGradient(context: context, barRect: barRect, gradientColors: colors, orientation: dataSet.barGradientOrientation)
     }
     
     open func drawGradient(context: CGContext, barRect: CGRect, gradientColors: Array<NSUIColor>, orientation: BarGradientOrientation)
@@ -431,7 +386,9 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             endPoint = CGPoint(x: barRect.maxX, y: barRect.midY)
         }
         
-        let path = CGPath(rect: barRect, transform: nil)
+        let cornerRadius = CGSize(width: barRect.width / 2.0, height: barRect.width / 2.0)
+        
+        let path = UIBezierPath(roundedRect: barRect, byRoundingCorners: [.topLeft, .topRight], cornerRadii: cornerRadius).cgPath
         
         context.addPath(path)
         context.clip()

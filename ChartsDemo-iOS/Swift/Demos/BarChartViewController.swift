@@ -143,11 +143,8 @@ class BarChartViewController: DemoBaseViewController {
         switch option {
         case .toggleBarGradient:
             for set in chartView.data!.dataSets as! [BarChartDataSet] {
-                if set.barGradientColors == nil {
-                    set.barGradientColors = ChartColorTemplates.gradients()
-                } else {
-                    set.barGradientColors = nil
-                }
+                set.barGradientColors = ChartColorTemplates.gradients()
+                set.barRoundingCorners = [.topLeft, .topRight]
             }
             chartView.notifyDataSetChanged()
         default:
